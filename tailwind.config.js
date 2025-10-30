@@ -10,7 +10,12 @@ export default {
 		"./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
 	],
 	theme: {
-		extend: {},
+		extend: {
+			maxWidth: {
+				'nav': '1280px',
+				'content': '1080px',
+			},
+		},
 	},
 	darkMode: "class",
 	plugins: [heroui()],

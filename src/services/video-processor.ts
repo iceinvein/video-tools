@@ -13,7 +13,6 @@ import type {
 	IVideoProcessor,
 	ProgressCallback,
 	TrimRange,
-	VideoFormat,
 	VideoOperation,
 } from "../types/video-tools";
 
@@ -33,6 +32,7 @@ export class VideoProcessor implements IVideoProcessor {
 
 	/**
 	 * Initialize FFmpeg.wasm with proper loading of core and wasm files
+	 * Lazy loads FFmpeg only when needed
 	 * @throws Error if FFmpeg fails to load
 	 */
 	async initialize(): Promise<void> {
@@ -41,6 +41,8 @@ export class VideoProcessor implements IVideoProcessor {
 		}
 
 		try {
+			console.log("[VideoProcessor] Starting FFmpeg initialization...");
+
 			// Set up progress logging
 			this.ffmpeg.on("log", ({ message }) => {
 				console.log("[FFmpeg]", message);
@@ -54,8 +56,9 @@ export class VideoProcessor implements IVideoProcessor {
 				}
 			});
 
-			// Load FFmpeg core and wasm files
-			const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+			// Load FFmpeg core and wasm files lazily from CDN
+			const baseURL =
+				"https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";
 
 			await this.ffmpeg.load({
 				coreURL: await toBlobURL(
@@ -71,14 +74,27 @@ export class VideoProcessor implements IVideoProcessor {
 			this.isLoaded = true;
 			console.log("[VideoProcessor] FFmpeg initialized successfully");
 		} catch (error) {
+			console.error("[VideoProcessor] FFmpeg initialization error:", error);
 			const errorMessage =
 				error instanceof Error ? error.message : "Unknown error";
-			console.error(
-				"[VideoProcessor] Failed to initialize FFmpeg:",
-				errorMessage,
-			);
+
+			// Check if SharedArrayBuffer is available
+			if (typeof SharedArrayBuffer === "undefined") {
+				throw new Error(
+					"SharedArrayBuffer is not available. Please ensure the page is served with proper cross-origin headers or try refreshing the page.",
+				);
+			}
+
 			throw new Error(`Failed to initialize FFmpeg: ${errorMessage}`);
 		}
+	}
+
+	/**
+	 * Check if FFmpeg is already loaded
+	 * @returns true if FFmpeg is initialized
+	 */
+	isInitialized(): boolean {
+		return this.isLoaded;
 	}
 
 	/**
@@ -146,7 +162,11 @@ export class VideoProcessor implements IVideoProcessor {
 	 */
 	private async readFile(filename: string): Promise<Blob> {
 		const data = await this.ffmpeg.readFile(filename);
-		return new Blob([data], { type: "video/mp4" });
+		const uint8Array =
+			data instanceof Uint8Array
+				? new Uint8Array(data)
+				: new TextEncoder().encode(data);
+		return new Blob([uint8Array], { type: "video/mp4" });
 	}
 
 	/**
@@ -157,12 +177,8 @@ export class VideoProcessor implements IVideoProcessor {
 		for (const filename of filenames) {
 			try {
 				await this.ffmpeg.deleteFile(filename);
-			} catch (error) {
-				// Ignore errors if file doesn't exist
-				console.warn(
-					`[VideoProcessor] Could not delete file ${filename}:`,
-					error,
-				);
+			} catch {
+				// Silently ignore errors if file doesn't exist
 			}
 		}
 	}
@@ -268,8 +284,6 @@ export class VideoProcessor implements IVideoProcessor {
 					"-preset",
 					"medium",
 				);
-			} else if (settings.codec === "vp9") {
-				args.push("-c:v", "libvpx-vp9", "-crf", crf.toString(), "-b:v", "0");
 			}
 
 			// Add bitrate if specified
@@ -364,59 +378,6 @@ export class VideoProcessor implements IVideoProcessor {
 	}
 
 	/**
-	 * Convert video to specified format
-	 * @param input Source video file
-	 * @param format Target format specification
-	 * @returns Processed video as Blob
-	 */
-	async convertFormat(input: File, format: VideoFormat): Promise<Blob> {
-		this.ensureInitialized();
-		this.isCancelled = false;
-
-		const inputName = "input.mp4";
-		const outputName = `output.${format.container}`;
-
-		try {
-			this.checkCancellation();
-
-			// Write input file
-			await this.writeFile(inputName, input);
-
-			this.checkCancellation();
-
-			// Execute format conversion
-			await this.ffmpeg.exec([
-				"-i",
-				inputName,
-				"-c:v",
-				format.videoCodec,
-				"-c:a",
-				format.audioCodec,
-				outputName,
-			]);
-
-			this.checkCancellation();
-
-			// Read output file with correct MIME type
-			const data = await this.ffmpeg.readFile(outputName);
-			const mimeType = `video/${format.container}`;
-			const output = new Blob([data], { type: mimeType });
-
-			// Cleanup
-			await this.cleanupFiles(inputName, outputName);
-
-			return output;
-		} catch (error) {
-			// Cleanup on error
-			await this.cleanupFiles(inputName, outputName);
-
-			const errorMessage =
-				error instanceof Error ? error.message : "Unknown error";
-			throw new Error(`Failed to convert video format: ${errorMessage}`);
-		}
-	}
-
-	/**
 	 * Process queue of operations sequentially
 	 * @param input Source video file
 	 * @param operations Array of operations to apply in order
@@ -435,6 +396,7 @@ export class VideoProcessor implements IVideoProcessor {
 
 		let currentBlob: Blob = input;
 		let currentFile: File = input;
+		const intermediateBlobs: Blob[] = [];
 
 		try {
 			for (let i = 0; i < sortedOps.length; i++) {
@@ -468,18 +430,13 @@ export class VideoProcessor implements IVideoProcessor {
 							operation.params as TrimRange,
 						);
 						break;
-					case "convert":
-						currentBlob = await this.convertFormat(
-							currentFile,
-							operation.params as VideoFormat,
-						);
-						break;
 					default:
 						throw new Error(`Unknown operation type: ${operation.type}`);
 				}
 
-				// Convert blob to file for next operation
+				// Store intermediate blob for cleanup (except the final one)
 				if (i < sortedOps.length - 1) {
+					intermediateBlobs.push(currentBlob);
 					currentFile = new File([currentBlob], `intermediate_${i}.mp4`, {
 						type: currentBlob.type,
 					});
@@ -491,8 +448,15 @@ export class VideoProcessor implements IVideoProcessor {
 				this.progressCallback(100);
 			}
 
+			// Note: Intermediate blobs will be garbage collected automatically
+			// We just clear the references to help the GC
+			intermediateBlobs.length = 0;
+
 			return currentBlob;
 		} catch (error) {
+			// Clear intermediate blobs on error
+			intermediateBlobs.length = 0;
+
 			const errorMessage =
 				error instanceof Error ? error.message : "Unknown error";
 			throw new Error(`Failed to process operation queue: ${errorMessage}`);

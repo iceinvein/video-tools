@@ -8,7 +8,6 @@ import type {
 	CompressionSettings,
 	CropRegion,
 	TrimRange,
-	VideoFormat,
 	VideoOperation,
 } from "../types/video-tools";
 import { VideoProcessor } from "./video-processor";
@@ -157,17 +156,7 @@ describe("VideoProcessor", () => {
 			expect(args).toContain("copy");
 		});
 
-		it("should generate correct vp9 compression command", async () => {
-			await processor.initialize();
-			const settings: CompressionSettings = { quality: 8, codec: "vp9" };
-			const execSpy = vi.spyOn(processor["ffmpeg"], "exec");
 
-			await processor.compressVideo(mockFile, settings);
-
-			const args = execSpy.mock.calls[0][0];
-			expect(args).toContain("-c:v");
-			expect(args).toContain("libvpx-vp9");
-		});
 
 		it("should include bitrate when specified", async () => {
 			await processor.initialize();
@@ -232,53 +221,7 @@ describe("VideoProcessor", () => {
 		});
 	});
 
-	describe("convertFormat", () => {
-		it("should throw error if not initialized", async () => {
-			const format: VideoFormat = {
-				container: "webm",
-				videoCodec: "libvpx-vp9",
-				audioCodec: "libopus",
-			};
-			await expect(processor.convertFormat(mockFile, format)).rejects.toThrow(
-				"FFmpeg not initialized",
-			);
-		});
 
-		it("should generate correct format conversion command", async () => {
-			await processor.initialize();
-			const format: VideoFormat = {
-				container: "webm",
-				videoCodec: "libvpx-vp9",
-				audioCodec: "libopus",
-			};
-			const execSpy = vi.spyOn(processor["ffmpeg"], "exec");
-
-			await processor.convertFormat(mockFile, format);
-
-			expect(execSpy).toHaveBeenCalledWith([
-				"-i",
-				"input.mp4",
-				"-c:v",
-				"libvpx-vp9",
-				"-c:a",
-				"libopus",
-				"output.webm",
-			]);
-		});
-
-		it("should return blob with correct MIME type", async () => {
-			await processor.initialize();
-			const format: VideoFormat = {
-				container: "webm",
-				videoCodec: "libvpx-vp9",
-				audioCodec: "libopus",
-			};
-
-			const result = await processor.convertFormat(mockFile, format);
-
-			expect(result.type).toBe("video/webm");
-		});
-	});
 
 	describe("processQueue", () => {
 		it("should throw error if not initialized", async () => {
@@ -349,16 +292,6 @@ describe("VideoProcessor", () => {
 					type: "trim",
 					params: { startTime: 0, endTime: 10 },
 					order: 2,
-				},
-				{
-					id: "4",
-					type: "convert",
-					params: {
-						container: "webm",
-						videoCodec: "libvpx-vp9",
-						audioCodec: "libopus",
-					},
-					order: 3,
 				},
 			];
 

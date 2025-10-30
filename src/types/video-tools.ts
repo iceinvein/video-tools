@@ -62,7 +62,7 @@ export interface CompressionSettings {
 	/** Target bitrate in bits per second (optional) */
 	targetBitrate?: number;
 	/** Video codec to use */
-	codec: "h264" | "h265" | "vp9";
+	codec: "h264" | "h265";
 	/** Optional width for resolution scaling */
 	scaleWidth?: number;
 	/** Optional height for resolution scaling */
@@ -70,21 +70,9 @@ export interface CompressionSettings {
 }
 
 /**
- * Video format specification
- */
-export interface VideoFormat {
-	/** Container format */
-	container: "mp4" | "webm" | "mov";
-	/** Video codec */
-	videoCodec: string;
-	/** Audio codec */
-	audioCodec: string;
-}
-
-/**
  * Type of video operation
  */
-export type VideoOperationType = "crop" | "compress" | "trim" | "convert";
+export type VideoOperationType = "crop" | "compress" | "trim";
 
 /**
  * Video operation to be applied
@@ -95,7 +83,7 @@ export interface VideoOperation {
 	/** Type of operation */
 	type: VideoOperationType;
 	/** Operation parameters (varies by type) */
-	params: CropRegion | CompressionSettings | TrimRange | VideoFormat;
+	params: CropRegion | CompressionSettings | TrimRange;
 	/** Order in which operation should be applied */
 	order: number;
 }
@@ -155,8 +143,6 @@ export interface IVideoProcessor {
 	compressVideo(input: File, settings: CompressionSettings): Promise<Blob>;
 	/** Trim video to specified time range */
 	trimVideo(input: File, range: TrimRange): Promise<Blob>;
-	/** Convert video to specified format */
-	convertFormat(input: File, format: VideoFormat): Promise<Blob>;
 	/** Process queue of operations */
 	processQueue(input: File, operations: VideoOperation[]): Promise<Blob>;
 	/** Cancel current processing */

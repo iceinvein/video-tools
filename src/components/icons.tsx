@@ -184,3 +184,57 @@ export const SearchIcon = (props: IconSvgProps) => (
 		/>
 	</svg>
 );
+
+export const VideoEditorIcon: React.FC<IconSvgProps> = ({
+	size = 24,
+	width,
+	height,
+	...props
+}) => {
+	return (
+		<svg
+			height={size || height}
+			viewBox="0 0 24 24"
+			width={size || width}
+			fill="none"
+			{...props}
+		>
+			<path
+				d="M22 8V16C22 20 21 21 17 21H7C3 21 2 20 2 16V8C2 4 3 3 7 3H17C21 3 22 4 22 8Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M2.52002 7.11H21.48"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M8.52002 3.11V6.97"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M15.48 3.11V6.52"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+			<path
+				d="M9.75 14.45V13.25C9.75 11.71 10.84 11.08 12.17 11.85L13.21 12.45L14.25 13.05C15.58 13.82 15.58 15.08 14.25 15.85L13.21 16.45L12.17 17.05C10.84 17.82 9.75 17.19 9.75 15.65V14.45V14.45Z"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeMiterlimit="10"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+};
