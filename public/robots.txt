@@ -1,0 +1,13 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://video-utilities.netlify.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 0
+
+# Disallow specific paths (if any)
+# Disallow: /api/
+# Disallow: /admin/

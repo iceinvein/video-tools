@@ -1,0 +1,40 @@
+{
+  "name": "Video Utilities - Free Online Video Editor",
+  "short_name": "Video Utilities",
+  "description": "Free browser-based video editor for cropping, compressing, and trimming videos. Privacy-focused with offline support.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "multimedia"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Edit Video",
+      "short_name": "Edit",
+      "description": "Start editing a video",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

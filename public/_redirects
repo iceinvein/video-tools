@@ -1,0 +1,10 @@
+# Netlify Redirects for SPA
+
+# Redirect all routes to index.html for client-side routing
+/*    /index.html   200
+
+# Optional: Redirect www to non-www (uncomment if needed)
+# https://www.video-utilities.netlify.app/*  https://video-utilities.netlify.app/:splat  301!
+
+# Optional: Force HTTPS (Netlify does this by default)
+# http://video-utilities.netlify.app/*  https://video-utilities.netlify.app/:splat  301!

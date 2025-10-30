@@ -590,20 +590,27 @@ export default function VideoEditor() {
 
 					{/* Welcome Header */}
 					{!source.file && (
-						<div className="flex flex-col text-center mb-8 mt-8 items-center">
-							<img src="/logo.png" alt="Logo" className="w-32 h-32" />
-							<h2 className="text-3xl md:text-4xl font-bold mb-3">
-								Video Editor
-							</h2>
+						<header className="flex flex-col text-center mb-8 mt-8 items-center">
+							<img
+								src="/logo.png"
+								alt="Video Utilities - Free Online Video Editor"
+								className="w-32 h-32"
+								width="128"
+								height="128"
+							/>
+							<h1 className="text-3xl md:text-4xl font-bold mb-3">
+								Free Online Video Editor
+							</h1>
 							<p className="text-default-600 text-base md:text-lg max-w-2xl mx-auto">
 								Edit your videos directly in your browser with powerful tools.
 								Crop, compress and trim videos without uploading to any server.
+								100% free and privacy-focused.
 							</p>
 							<p className="text-default-500 text-sm mt-2">
 								All processing happens locally on your device for maximum
-								privacy and speed.
+								privacy and speed. No registration required.
 							</p>
-						</div>
+						</header>
 					)}
 
 					{/* Video Upload */}
@@ -616,10 +623,16 @@ export default function VideoEditor() {
 							</div>
 
 							{/* Feature Cards */}
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 mb-8">
+							<section
+								className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 mb-8"
+								aria-label="Video editing features"
+							>
 								<Card className="border border-divider">
 									<CardBody className="p-6 flex flex-col items-center text-center">
-										<div className="w-10 h-10 mb-3 flex items-center justify-center">
+										<div
+											className="w-10 h-10 mb-3 flex items-center justify-center"
+											aria-hidden="true"
+										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												fill="none"
@@ -636,17 +649,20 @@ export default function VideoEditor() {
 											</svg>
 										</div>
 										<h3 className="font-semibold text-sm mb-1">
-											Crop & Resize
+											Crop & Resize Videos
 										</h3>
 										<p className="text-xs text-default-500">
-											Extract specific regions
+											Extract specific regions from your videos
 										</p>
 									</CardBody>
 								</Card>
 
 								<Card className="border border-divider">
 									<CardBody className="p-6 flex flex-col items-center text-center">
-										<div className="w-10 h-10 mb-3 flex items-center justify-center">
+										<div
+											className="w-10 h-10 mb-3 flex items-center justify-center"
+											aria-hidden="true"
+										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												fill="none"
@@ -662,14 +678,21 @@ export default function VideoEditor() {
 												/>
 											</svg>
 										</div>
-										<h3 className="font-semibold text-sm mb-1">Compress</h3>
-										<p className="text-xs text-default-500">Reduce file size</p>
+										<h3 className="font-semibold text-sm mb-1">
+											Compress Videos
+										</h3>
+										<p className="text-xs text-default-500">
+											Reduce file size with H.264/H.265
+										</p>
 									</CardBody>
 								</Card>
 
 								<Card className="border border-divider">
 									<CardBody className="p-6 flex flex-col items-center text-center">
-										<div className="w-10 h-10 mb-3 flex items-center justify-center">
+										<div
+											className="w-10 h-10 mb-3 flex items-center justify-center"
+											aria-hidden="true"
+										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												fill="none"
@@ -685,13 +708,13 @@ export default function VideoEditor() {
 												/>
 											</svg>
 										</div>
-										<h3 className="font-semibold text-sm mb-1">Trim</h3>
+										<h3 className="font-semibold text-sm mb-1">Trim Videos</h3>
 										<p className="text-xs text-default-500">
-											Cut to time ranges
+											Cut videos to specific time ranges
 										</p>
 									</CardBody>
 								</Card>
-							</div>
+							</section>
 
 							{/* Additional Info Cards */}
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">

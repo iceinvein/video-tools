@@ -35,7 +35,7 @@ Requires a modern browser with WebAssembly and SharedArrayBuffer support:
 
 ### Prerequisites
 
-- Node.js 18+ or Bun
+- Node.js 22 (LTS) or Bun 1.1+
 - Modern web browser with WebAssembly support
 
 ### Installation

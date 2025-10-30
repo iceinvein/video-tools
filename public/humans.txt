@@ -1,0 +1,34 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Developer -- Dik Rana
+    Site -- https://video-utilities.netlify.app
+    Location -- Perth, Australia
+
+# THANKS
+
+    FFmpeg.wasm team
+    Hero UI team
+    Open source community
+
+# TECHNOLOGY COLOPHON
+
+    Frontend Framework -- React 19
+    UI Library -- Hero UI (NextUI)
+    Styling -- Tailwind CSS 4
+    Video Processing -- FFmpeg.wasm
+    State Management -- Nanostores
+    Build Tool -- Vite
+    Runtime -- Bun
+    Hosting -- Netlify
+    Language -- TypeScript
+
+# FEATURES
+
+    100% Privacy-focused
+    No server uploads
+    Client-side processing
+    Offline capable
+    Free forever
